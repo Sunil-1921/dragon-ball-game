@@ -16,16 +16,6 @@ const background = new Sprite({
   imageSrc: './img/bg.jpg'
 })
 
-// const shop = new Sprite({
-//   position: {
-//     x: 600,
-//     y: 128
-//   },
-//   imageSrc: './img/shop.png',
-//   scale: 2.75,
-//   framesMax: 6
-// })
-
 const player = new Fighter({
   position: {
     x: 0,
@@ -39,8 +29,6 @@ const player = new Fighter({
     x: 0,
     y: 0
   },
-  imageSrc: './img/samuraiMack/Idle.png',
-  framesMax: 8,
   scale: 2,
   offset: {
     x: -100,
@@ -83,25 +71,25 @@ const player = new Fighter({
       imageSrc: './img/goku/angry/Jump-Angry.png',
       framesMax: 1
     },
-    // fall: {
-    //   imageSrc: './img/goku/Jump.png',
-    //   framesMax: 1
-    // },
     attack1: {
       imageSrc: './img/goku/Attack1.png',
       framesMax: 3
+    },
+    angryattack2: {
+      imageSrc: './img/goku/angry/Attack2-Angry.png',
+      framesMax: 7
     },
     attack2: {
       imageSrc: './img/goku/Attack2.png',
       framesMax: 3
     },
     takeHit: {
-      imageSrc: './img/samuraiMack/Take Hit - white silhouette.png',
-      framesMax: 4
+      imageSrc: './img/goku/TakeHit.png',
+      framesMax: 5
     },
     death: {
-      imageSrc: './img/samuraiMack/Death.png',
-      framesMax: 6
+      imageSrc: './img/goku/Death.png',
+      framesMax: 3
     }
   },
   attackBox: {
@@ -128,8 +116,6 @@ const enemy = new Fighter({
     x: -50,
     y: 0
   },
-  imageSrc: './img/vageta/Idle.png',
-  framesMax: 4,
   scale: 2,
   offset: {
     x: -100,
@@ -152,10 +138,6 @@ const enemy = new Fighter({
       imageSrc: './img/vageta/Jump.png',
       framesMax: 1
     },
-    // fall: {
-    //   imageSrc: './img/kenji/Fall.png',
-    //   framesMax: 2
-    // },
     attack1: {
       imageSrc: './img/vageta/Attack1.png',
       framesMax: 4
@@ -178,8 +160,6 @@ const enemy = new Fighter({
     height: 30
   }
 })
-
-// console.log(player)
 
 const keys = {
   a: {
@@ -217,7 +197,6 @@ function animate() {
   enemy.velocity.x = 0
 
   // player movement
-
   if (keys.a.pressed && player.lastKey === 'a') {
     if (!modes.getangry) {
       player.velocity.x = -4
@@ -281,7 +260,6 @@ function animate() {
   // jumping
   if (enemy.velocity.y < 0) {
     enemy.switchSprite('jump')
-    // console.log("enemy jump")
   } else if (enemy.velocity.y > 0) {
     enemy.switchSprite('jump')
   }
@@ -294,10 +272,11 @@ function animate() {
     }) &&
     player.isAttacking
     // player.framesCurrent === 4
-    // player.framesCurrent === 1
   ) {
     enemy.takeHit()
-    enemy.velocity.x = 10
+    if (!enemy.dead) {
+      enemy.velocity.x = 10
+    }
     player.isAttacking = false
 
     gsap.to('#enemyHealth', {
@@ -317,12 +296,13 @@ function animate() {
       rectangle1: enemy,
       rectangle2: player
     }) &&
-    enemy.isAttacking &&
-    enemy.framesCurrent === 2
+    enemy.isAttacking
   ) {
     player.takeHit()
+    if (!player.dead) {
+      player.velocity.x = -10
+    }
     enemy.isAttacking = false
-    player.velocity.x = -10
 
     gsap.to('#playerHealth', {
       width: player.health + '%'
@@ -359,15 +339,20 @@ window.addEventListener('keydown', (event) => {
         break
       case 'w':
         if (player.position.y > 680) {
-          // if (modes.getangry) {
-          //   player.velocity.y = -20
-          // }
-          // else {
-          player.velocity.y = -15
-          // }
+          if (modes.getangry) {
+            player.velocity.y = -20
+          }
+          else {
+            player.velocity.y = -15
+          }
         }
         break
       case ' ':
+        if (modes.getangry) {
+          player.switchSprite('angryattack2')
+        } else {
+          player.switchSprite('attack1')
+        }
         player.attack()
         break
     }
@@ -389,6 +374,7 @@ window.addEventListener('keydown', (event) => {
         }
         break
       case 'ArrowDown':
+        enemy.switchSprite('attack1')
         enemy.attack()
 
         break

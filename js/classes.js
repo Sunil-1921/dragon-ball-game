@@ -103,19 +103,9 @@ class Fighter extends Sprite {
     this.draw()
     if (!this.dead) this.animateFrames()
 
-    // c.fillRect(this.attackBox.position.x, this.attackBox.position.y, this.attackBox.width, this.attackBox.height)
-
     // attack boxes
     this.attackBox.position.x = this.position.x + this.attackBox.offset.x
     this.attackBox.position.y = this.position.y + this.attackBox.offset.y
-
-    // draw the attack box
-    // c.fillRect(
-    //   this.attackBox.position.x,
-    //   this.attackBox.position.y,
-    //   this.attackBox.width,
-    //   this.attackBox.height
-    // )
 
     this.position.x += this.velocity.x
     this.position.y += this.velocity.y
@@ -128,23 +118,25 @@ class Fighter extends Sprite {
   }
 
   attack() {
-    this.switchSprite('attack1')
+    // this.switchSprite('attack1')
     this.isAttacking = true
   }
 
   takeHit() {
     this.health -= 10
-    this.switchSprite('takehit')
-
-    if (this.health <= 0) {
-      this.switchSprite('death')
-    } else this.switchSprite('idle')
+    if (this.health > 9) {
+      this.switchSprite('takeHit')
+    }
+    if (this.health === 0) {
+      this.switchSprite("death")
+    }
   }
 
   switchSprite(sprite) {
     if (this.image === this.sprites.death.image) {
-      if (this.framesCurrent === this.sprites.death.framesMax - 1)
+      if (this.framesCurrent === this.sprites.death.framesMax - 1) {
         this.dead = true
+      }
       return
     }
 
@@ -153,19 +145,23 @@ class Fighter extends Sprite {
       this.image === this.sprites.attack1.image &&
       this.framesCurrent < this.sprites.attack1.framesMax - 1
     ) {
-      // console.log("attacking..")
-      // player.velocity.x = 1
-      // enemy.velocity.x = -1
-      // this.velocity.x = -1
       return
     }
-    // override when fighter gets hit
     if (
+      player.image === player.sprites.angryattack2.image &&
+      player.framesCurrent < player.sprites.angryattack2.framesMax - 1
+    ) {
+      player.position.y = 650
+      return
+    }
+
+    // override when fighter gets hit
+    else if (
       this.image === this.sprites.takeHit.image &&
       this.framesCurrent < this.sprites.takeHit.framesMax - 1
-    )
+    ) {
       return
-
+    }
     switch (sprite) {
       case 'idle':
         if (this.image !== this.sprites.idle.image) {
@@ -223,13 +219,6 @@ class Fighter extends Sprite {
           this.framesCurrent = 0
         }
         break
-      // case 'fall':
-      //   if (this.image !== this.sprites.fall.image) {
-      //     this.image = this.sprites.fall.image
-      //     this.framesMax = this.sprites.fall.framesMax
-      //     this.framesCurrent = 0
-      //   }
-      //   break
       case 'angry':
         if (this.image !== this.sprites.angry.image) {
           this.image = this.sprites.angry.image
@@ -241,6 +230,13 @@ class Fighter extends Sprite {
         if (this.image !== this.sprites.attack1.image) {
           this.image = this.sprites.attack1.image
           this.framesMax = this.sprites.attack1.framesMax
+          this.framesCurrent = 0
+        }
+        break
+      case 'angryattack2':
+        if (this.image !== this.sprites.angryattack2.image) {
+          this.image = this.sprites.angryattack2.image
+          this.framesMax = this.sprites.angryattack2.framesMax
           this.framesCurrent = 0
         }
         break
